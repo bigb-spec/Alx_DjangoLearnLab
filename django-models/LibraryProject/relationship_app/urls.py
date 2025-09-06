@@ -6,7 +6,7 @@ urlpatterns = [
     # Register view
     path("register/", views.register, name="register"),
 
-    # Login view (using Django's built-in LoginView)
+    # Login view
     path(
         "login/",
         LoginView.as_view(template_name="registration/login.html"),
