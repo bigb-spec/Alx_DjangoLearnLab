@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.decorators import user_passes_test 
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.forms import UserCreationForm 
 from django.contrib.auth import login  
-from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponse
 from django.views.generic.detail import DetailView
 from .models import Book
@@ -44,3 +44,15 @@ def librarian_view(request):
 @user_passes_test(is_member)
 def member_view(request):
     return render(request, "relationship_app/member_view.html")
+
+# user registration view
+def register(request):
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('login')  # after registering, redirect to login
+    else:
+        form = UserCreationForm()
+    return render(request, "relationship_app/register.html", {"form": form})
