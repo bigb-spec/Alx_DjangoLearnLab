@@ -21,8 +21,17 @@ urlpatterns = [
     ),
 ]
 
+# Role-based views 
 urlpatterns = [
     path("admin-view/", views.admin_view, name="admin_view"),
     path("librarian-view/", views.librarian_view, name="librarian_view"),
     path("member-view/", views.member_view, name="member_view"),
+]
+
+# Book and Library views 
+urlpatterns = [
+    path("books/", views.book_list, name="book_list"),
+    path("books/add/", views.add_book, name="add_book"),
+    path("books/<int:book_id>/edit/", views.edit_book, name="edit_book"),
+    path("books/<int:book_id>/delete/", views.delete_book, name="delete_book"),
 ]
