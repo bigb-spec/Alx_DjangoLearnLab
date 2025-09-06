@@ -1,5 +1,7 @@
 from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.decorators import user_passes_test # for role-based access
+from django.contrib.auth.decorators import user_passes_test 
+from django.contrib.auth import login  
+from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponse
 from django.views.generic.detail import DetailView
 from .models import Book
