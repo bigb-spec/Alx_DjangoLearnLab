@@ -46,6 +46,7 @@ def book_delete(request, book_id):
 from django.shortcuts import render
 from .models import Book
 from .forms import BookSearchForm
+from .forms import ExampleForm
 
 def book_search(request):
     form = BookSearchForm(request.GET or None)
