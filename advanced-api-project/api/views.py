@@ -1,3 +1,19 @@
+"""
+Views for Book API
+------------------
+- BookListCreateView:
+    Handles GET (list all books) and POST (create book).
+    Read allowed for everyone, write restricted to authenticated users.
+
+- BookDetailView:
+    Handles GET (single book), PUT/PATCH (update), DELETE (remove).
+    Read allowed for everyone, write restricted to authenticated users.
+
+Customizations:
+- Permissions enforced per HTTP method.
+- Filtering support (year, author).
+"""
+
 from django.shortcuts import render
 from rest_framework import generics, permissions
 from .models import Book
@@ -37,4 +53,13 @@ class BookDetailView(generics.RetrieveUpdateDestroyAPIView):
             return [permissions.IsAuthenticated()]
         return [permissions.AllowAny()]
 
+def get_queryset(self):
+    queryset = Book.objects.all()
+    year = self.request.query_params.get("year")
+    author = self.request.query_params.get("author")
+    if year:
+        queryset = queryset.filter(publication_year=year)
+    if author:
+        queryset = queryset.filter(author__name__icontains=author)
+    return queryset
 
