@@ -19,47 +19,53 @@ from rest_framework import generics, permissions
 from .models import Book
 from .serializers import BookSerializer
 
-# Generic Views for Book
+# Book CRUD Views
 
-# List all books / Create new book
-class BookListCreateView(generics.ListCreateAPIView):
+class BookListView(generics.ListAPIView):
     """
     GET: Return a list of all books.
-    POST: Create a new book (authenticated users only).
+    Read-only, no authentication required.
     """
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-
-    # Allow read-only for unauthenticated, but restrict create to logged in users
-    def get_permissions(self):
-        if self.request.method == "POST":
-            return [permissions.IsAuthenticated()]
-        return [permissions.AllowAny()]
+    permission_classes = [permissions.AllowAny]
 
 
-# Retrieve / Update / Delete a single book
-class BookDetailView(generics.RetrieveUpdateDestroyAPIView):
+class BookDetailView(generics.RetrieveAPIView):
     """
-    GET: Retrieve a book by ID.
-    PUT/PATCH: Update a book (authenticated users only).
-    DELETE: Remove a book (authenticated users only).
+    GET: Retrieve a single book by ID.
+    Read-only, no authentication required.
     """
     queryset = Book.objects.all()
     serializer_class = BookSerializer
+    permission_classes = [permissions.AllowAny]
 
-    # Allow read-only for unauthenticated, restrict update/delete to logged in users
-    def get_permissions(self):
-        if self.request.method in ["PUT", "PATCH", "DELETE"]:
-            return [permissions.IsAuthenticated()]
-        return [permissions.AllowAny()]
 
-def get_queryset(self):
+class BookCreateView(generics.CreateAPIView):
+    """
+    POST: Create a new book.
+    Requires authentication.
+    """
     queryset = Book.objects.all()
-    year = self.request.query_params.get("year")
-    author = self.request.query_params.get("author")
-    if year:
-        queryset = queryset.filter(publication_year=year)
-    if author:
-        queryset = queryset.filter(author__name__icontains=author)
-    return queryset
+    serializer_class = BookSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
+
+class BookUpdateView(generics.UpdateAPIView):
+    """
+    PUT/PATCH: Update an existing book.
+    Requires authentication.
+    """
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class BookDeleteView(generics.DestroyAPIView):
+    """
+    DELETE: Remove a book.
+    Requires authentication.
+    """
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [permissions.IsAuthenticated]
