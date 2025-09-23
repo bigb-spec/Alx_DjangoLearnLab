@@ -15,22 +15,32 @@ Customizations:
 """
 
 from django.shortcuts import render
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, filters 
 from .models import Book
 from .serializers import BookSerializer
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated 
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend 
 
 
 # Book CRUD Views
 
 class BookListView(generics.ListAPIView):
     """
-    GET: Return a list of all books.
-    Read-only, no authentication required.
+    GET /api/books/?title=xyz&author=1&publication_year=2020
+    GET /api/books/?search=Harry
+    GET /api/books/?ordering=title
+    GET /api/books/?ordering=-publication_year
     """
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [permissions.AllowAny]
+
+    # ✅ Enable filtering, searching, ordering
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['title', 'author', 'publication_year']  # Filtering
+    search_fields = ['title', 'author__name']  # Searching
+    ordering_fields = ['title', 'publication_year']  # Ordering
+    ordering = ['title']  # Default ordering
 
 
 class BookDetailView(generics.RetrieveAPIView):
