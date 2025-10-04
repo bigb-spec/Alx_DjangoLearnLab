@@ -39,3 +39,10 @@ class Profile(models.Model):
 
     def __str__(self):
         return f'{self.user.username} Profile'
+
+class Tag(models.Model):
+    name = models.CharField(max_length=30, unique=True)
+    posts = models.ManyToManyField(Post, related_name='tags', blank=True)
+
+    def __str__(self):
+        return self.name
