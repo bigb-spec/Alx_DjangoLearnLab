@@ -8,6 +8,7 @@ from django.urls import reverse_lazy, reverse
 from django.contrib import messages 
 from .models import Post, Comment, Tag 
 from .forms import PostForm, CommentForm 
+from django.db.models import Q
 
 @login_required
 def profile(request):   
@@ -59,6 +60,19 @@ class PostDetailView(DetailView):
         context['comments'] = comments
         context['comment_form'] = CommentForm()
         return context
+    
+    def post_list(request):
+        query = request.GET.get('q')
+        posts = Post.objects.all()
+
+        if query:
+            posts = posts.filter(
+            Q(title__icontains=query) |
+            Q(content__icontains=query) |
+            Q(tags__name__icontains=query)
+        ).distinct()
+
+        return render(request, 'blog/post_list.html', {'posts': posts, 'query': query})
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
