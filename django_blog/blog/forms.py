@@ -1,7 +1,8 @@
 from django import forms
 from django.contrib.auth.models import User
 from .models import Profile
-from models import Post, Comment, Tag  
+from models import Post, Comment, Tag
+from taggit.forms import TagWidget 
 
 class UserUpdateForm(forms.ModelForm):
     email = forms.EmailField()
@@ -26,6 +27,9 @@ class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ['title', 'content', 'published']
+        widgets = {
+            'tags': TagWidget(),
+        }   
 
     def __init__(self, *args, **kwargs):
         # if editing an existing post, populate tags_field with existing tags
