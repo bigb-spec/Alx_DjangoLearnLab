@@ -6,7 +6,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy, reverse
 from django.contrib import messages 
-from .models import Post, Comment
+from .models import Post, Comment, Tag 
 from .forms import PostForm, CommentForm 
 
 @login_required
@@ -36,6 +36,16 @@ class PostListView(ListView):
     ordering = ['-date_posted']
     paginate_by = 10
     queryset = Post.objects.filter(published_date=True)
+
+def get_queryset(self):
+        return Post.objects.filter(published_date=True).order_by('-date_posted')
+        if self.request.GET.get('tag'):
+            tag_name = self.request.GET.get('tag')
+            self.queryset = self.queryset.filter(tags__name__iexact=tag_name)
+        if self.request.GET.get('author'):
+            author_username = self.request.GET.get('author')
+            self.queryset = self.queryset.filter(author__username__iexact=author_username) 
+        return self.queryset
 
 class PostDetailView(DetailView):
     model = Post
@@ -143,3 +153,19 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
     def test_func(self):
         comment = self.get_object()
         return comment.author == self.request.user
+
+class TagPostListView(ListView):
+    model = Post
+    template_name = 'blog/post_list.html'
+    context_object_name = 'posts'
+    paginate_by = 10
+
+    def get_queryset(self):
+        tag_slug = self.kwargs.get('tag_slug')
+        self.tag = Tag.objects.get(slug=tag_slug)
+        return Post.objects.filter(tags=self.tag, published=True)
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['tag'] = self.tag
+        return ctx
