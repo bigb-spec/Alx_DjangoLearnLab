@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.utils.text import slugify
 
 class Post(models.Model):
     title = models.CharField(max_length=100)
@@ -43,6 +44,15 @@ class Profile(models.Model):
 class Tag(models.Model):
     name = models.CharField(max_length=30, unique=True)
     posts = models.ManyToManyField(Post, related_name='tags', blank=True)
+    slug = models.SlugField(max_length=30, unique=True, blank=True)
+
+    class Meta:
+        ordering = ['name']
 
     def __str__(self):
         return self.name
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
